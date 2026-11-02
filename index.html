@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Disaster Rescue Path Planning System | DAA Decision-Support System</title>
+  <meta name="description" content="Algorithm-driven emergency route planning and DAA laboratory system implementing Dijkstra, Bellman-Ford, Floyd-Warshall, Prim, Kruskal, DP, Backtracking and Branch & Bound.">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- ==========================================
+       SCREEN 1: LOGIN AUTHENTICATION (SECTION 15.1 - M1)
+       ========================================== -->
+  <div id="screen-login" class="login-screen">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-logo">⚡</div>
+        <h2>DISASTER RESCUE PATH PLANNING SYSTEM</h2>
+        <p>Design & Analysis of Algorithms (DAA) • Tactical Command Entry</p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="loginOperatorId">Operator / Personnel ID</label>
+        <input type="text" id="loginOperatorId" class="form-input" value="OP-7092" placeholder="e.g. OP-7092">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="loginRole">Assigned Role (M1)</label>
+        <select id="loginRole" class="form-select">
+          <option value="Rescue Commander">🎖️ Rescue Commander (Full Operational Access)</option>
+          <option value="Emergency Dispatcher">🚨 Emergency Dispatcher (Route Planning)</option>
+          <option value="DAA Academic Examiner">🎓 DAA Academic Examiner (Algorithm Lab & Tests)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="loginScenario">Initial Disaster Theater</label>
+        <select id="loginScenario" class="form-select">
+          <option value="workedExamplePage18">📄 DAA Report Worked Example (Page 18 - 5 Nodes)</option>
+          <option value="metropolitanFlood">🌊 Metropolitan Urban Flood Grid (9 Nodes)</option>
+          <option value="mountainLandslide">⛰️ Mountain Landslide Sector (7 Nodes)</option>
+        </select>
+      </div>
+
+      <div class="login-btn-row">
+        <button id="btnLoginSubmit" class="btn btn-primary btn-block">
+          🔐 Authenticate & Enter Dashboard
+        </button>
+      </div>
+
+      <div style="text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+        Section 15.1 Flow: Login ➔ Dashboard ➔ Incident ➔ Locations ➔ Roads ➔ Route
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       SCREEN 2: MAIN APPLICATION WORKSPACE
+       ========================================== -->
+  <div id="screen-app" style="display: none;">
+
+    <!-- APP HEADER & HUD -->
+    <header class="app-header">
+      <div class="header-inner">
+        <div class="brand-wrapper">
+          <div class="brand-badge">⚡</div>
+          <div class="brand-text">
+            <h1>DISASTER RESCUE PATH PLANNING SYSTEM</h1>
+            <p>Design and Analysis of Algorithms (DAA) • Operational Decision Support</p>
+          </div>
+        </div>
+
+        <div class="header-status-group">
+          <div class="status-indicator">
+            <div class="status-dot"></div>
+            <span id="systemStatusText">OPERATIONAL • DIJKSTRA READY</span>
+          </div>
+
+          <div class="preset-selector-container">
+            <label for="scenarioPreset">Scenario:</label>
+            <select id="scenarioPreset" class="custom-select">
+              <option value="workedExamplePage18">📄 DAA Report Worked Example (Page 18)</option>
+              <option value="metropolitanFlood">🌊 Metropolitan Urban Flood Grid</option>
+              <option value="mountainLandslide">⛰️ Mountain Landslide Sector</option>
+            </select>
+          </div>
+
+          <div class="ai-badge">
+            <span>🧠</span>
+            <span>AI/ML: RescueRiskNet-v2 (96.8% Acc)</span>
+          </div>
+
+          <div class="user-operator-badge">
+            <span>👤</span>
+            <span id="userBadgeName">Sonali [MCA AI/ML Commander]</span>
+          </div>
+
+          <button id="btnLogout" class="btn-logout" title="Log out and return to Login Screen">
+            🔒 Logout
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- NAVIGATION TABS -->
+    <nav class="nav-tabs-wrapper">
+      <ul class="nav-tabs">
+        <li><button class="tab-btn active" data-tab="tab-dashboard">🏠 Dashboard</button></li>
+        <li><button class="tab-btn" data-tab="tab-aiml" style="color: #c4b5fd; font-weight: 700;">🧠 AI/ML Command Center</button></li>
+        <li><button class="tab-btn" data-tab="tab-incidents">🚨 Incidents (M2)</button></li>
+        <li><button class="tab-btn" data-tab="tab-ops">🗺️ Plan Rescue Route (M7)</button></li>
+        <li><button class="tab-btn" data-tab="tab-network">🌐 Locations & Roads (M3, M4)</button></li>
+        <li><button class="tab-btn" data-tab="tab-mst">🌲 Infrastructure MST (M8)</button></li>
+        <li><button class="tab-btn" data-tab="tab-lab">🧪 DAA Algorithm Lab (M9)</button></li>
+        <li><button class="tab-btn" data-tab="tab-db">🗄️ Database & Schema</button></li>
+        <li><button class="tab-btn" data-tab="tab-arch">📐 ER & DFD Diagrams</button></li>
+        <li><button class="tab-btn" data-tab="tab-tests">📊 Reports & Tests (TC01-10)</button></li>
+        <li><button class="tab-btn" data-tab="tab-viva">🎓 Syllabus & Viva Master</button></li>
+      </ul>
+    </nav>
+
+    <!-- MAIN CONTAINER -->
+    <main class="app-container">
+
+      <!-- ========================================
+           TAB 0: DASHBOARD (SECTION 15.1 & 15.2)
+           ======================================== -->
+      <section id="tab-dashboard" class="tab-view active">
+        
+        <!-- Hero Header -->
+        <div class="dashboard-hero-banner">
+          <div class="dashboard-ascii-title">
+            ---------------------------------------------<br>
+            &nbsp;&nbsp;&nbsp;DISASTER RESCUE PATH PLANNING SYSTEM<br>
+            ---------------------------------------------
+          </div>
+          <div class="dashboard-subtitle">
+            Central Decision-Support Command System • Algorithmic Route Optimization & Incident Coordination
+          </div>
+
+          <!-- 4 Core KPI Counters from User's Prompt -->
+          <div class="kpi-summary-grid">
+            <div class="kpi-box kpi-disasters">
+              <div class="kpi-info">
+                <span class="kpi-title">Active Disasters</span>
+                <span id="kpiActiveDisasters" class="kpi-number">3</span>
+              </div>
+              <div class="kpi-icon">🚨</div>
+            </div>
+
+            <div class="kpi-box kpi-open">
+              <div class="kpi-info">
+                <span class="kpi-title">Open Routes</span>
+                <span id="kpiOpenRoutes" class="kpi-number">28</span>
+              </div>
+              <div class="kpi-icon">🛣️</div>
+            </div>
+
+            <div class="kpi-box kpi-blocked">
+              <div class="kpi-info">
+                <span class="kpi-title">Blocked Routes</span>
+                <span id="kpiBlockedRoutes" class="kpi-number">7</span>
+              </div>
+              <div class="kpi-icon">⚠️</div>
+            </div>
+
+            <div class="kpi-box kpi-requests">
+              <div class="kpi-info">
+                <span class="kpi-title">Rescue Requests</span>
+                <span id="kpiRescueRequests" class="kpi-number">12</span>
+              </div>
+              <div class="kpi-icon">🚑</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Workflow Stepper Breadcrumb (Section 15.1) -->
+        <div class="workflow-stepper-box">
+          <div class="stepper-header">
+            <span>🔄 Official DAA Project Workflow Sequence (Section 15.1)</span>
+          </div>
+          <div class="stepper-chain">
+            <div class="step-node active" data-jump-tab="tab-dashboard"><span>1</span> Login & Dashboard</div>
+            <span class="step-arrow">➔</span>
+            <div class="step-node" data-jump-tab="tab-incidents"><span>2</span> Manage Incidents</div>
+            <span class="step-arrow">➔</span>
+            <div class="step-node" data-jump-tab="tab-network"><span>3</span> Locations (V)</div>
+            <span class="step-arrow">➔</span>
+            <div class="step-node" data-jump-tab="tab-network"><span>4</span> Roads & Routes (E)</div>
+            <span class="step-arrow">➔</span>
+            <div class="step-node" data-jump-tab="tab-ops"><span>5</span> Rescue Request</div>
+            <span class="step-arrow">➔</span>
+            <div class="step-node" data-jump-tab="tab-ops"><span>6</span> Source + Destination</div>
+            <span class="step-arrow">➔</span>
+            <div class="step-node" data-jump-tab="tab-ops"><span>7</span> Algorithm Select</div>
+            <span class="step-arrow">➔</span>
+            <div class="step-node" data-jump-tab="tab-ops"><span>8</span> Calculate Route</div>
+            <span class="step-arrow">➔</span>
+            <div class="step-node" data-jump-tab="tab-ops"><span>9</span> Best Route</div>
+            <span class="step-arrow">➔</span>
+            <div class="step-node" data-jump-tab="tab-tests"><span>10</span> Result / Report</div>
+          </div>
+        </div>
+
+        <!-- 6 Main Action Modules Matching Prompt -->
+        <div class="dashboard-actions-grid">
+          <div class="action-tile-btn" data-jump-tab="tab-incidents">
+            <div class="action-tile-icon" style="color: #f87171;">🚨</div>
+            <div class="action-tile-title">[Manage Incidents]</div>
+            <div class="action-tile-desc">Log disaster events (flood, earthquake, landslide), urgency levels, and rescue operational requests.</div>
+          </div>
+
+          <div class="action-tile-btn" data-jump-tab="tab-network">
+            <div class="action-tile-icon" style="color: #38bdf8;">📍</div>
+            <div class="action-tile-title">[Manage Locations]</div>
+            <div class="action-tile-desc">Inspect & search rescue bases, hospitals, incident zones, shelters, and junctions via Binary & Linear Search.</div>
+          </div>
+
+          <div class="action-tile-btn" data-jump-tab="tab-network">
+            <div class="action-tile-icon" style="color: #fbbf24;">🛣️</div>
+            <div class="action-tile-title">[Manage Roads]</div>
+            <div class="action-tile-desc">Update distance, travel time, hazard risk score, and mark links as OPEN, RESTRICTED, or BLOCKED.</div>
+          </div>
+
+          <div class="action-tile-btn" data-jump-tab="tab-ops">
+            <div class="action-tile-icon" style="color: #34d399;">🚀</div>
+            <div class="action-tile-title">[Plan Rescue Route]</div>
+            <div class="action-tile-desc">Execute Dijkstra, Bellman-Ford, or Floyd-Warshall to compute optimal, safe paths with step-by-step playback.</div>
+          </div>
+
+          <div class="action-tile-btn" data-jump-tab="tab-lab">
+            <div class="action-tile-icon" style="color: #a78bfa;">🧪</div>
+            <div class="action-tile-title">[Algorithm Lab]</div>
+            <div class="action-tile-desc">Explore DAA Unit 1, 2, 3 syllabus algorithms: Sorting benchmark, Knapsack (0/1 vs Fractional), Backtracking, and B&B.</div>
+          </div>
+
+          <div class="action-tile-btn" data-jump-tab="tab-tests">
+            <div class="action-tile-icon" style="color: #38bdf8;">📊</div>
+            <div class="action-tile-title">[Reports & Tests]</div>
+            <div class="action-tile-desc">Run automated verification for Test Cases TC01-TC10, inspect complexity tables, and export formal reports.</div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ========================================
+           TAB AI/ML: AI & MACHINE LEARNING COMMAND CENTER (SONALI'S MCA MODULE)
+           ======================================== -->
+      <section id="tab-aiml" class="tab-view">
+        <div class="panel ai-card-glow">
+          <div class="panel-header">
+            <div>
+              <span class="panel-title" style="font-size: 1.15rem; color: #c4b5fd;">
+                🧠 AI & Machine Learning Intelligence Hub (Sonali — MCA AI/ML Module)
+              </span>
+              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                Integrates Deep Machine Learning (RescueRiskNet-v2), Reinforcement Learning (Q-Learning Navigation Agent), and Natural Language Processing (NLP SOS Triage) directly with DAA Graph Algorithms.
+              </p>
+            </div>
+            <div class="ai-badge">
+              <span>⚡</span><span>Model Status: ACTIVE INFERENCE</span>
+            </div>
+          </div>
+
+          <!-- AI Model Performance Telemetry Bar -->
+          <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.75rem; margin-top: 0.5rem;">
+            <div class="ai-comparison-card">
+              <span class="metric-label">Model Architecture</span>
+              <span style="font-size: 0.85rem; font-weight: 700; color: #c4b5fd;">RescueRiskNet-v2</span>
+            </div>
+            <div class="ai-comparison-card">
+              <span class="metric-label">Model Accuracy</span>
+              <span style="font-size: 1.25rem; font-weight: 700; color: #34d399; font-family: var(--font-mono);">96.8%</span>
+            </div>
+            <div class="ai-comparison-card">
+              <span class="metric-label">F1-Score / ROC-AUC</span>
+              <span style="font-size: 1.25rem; font-weight: 700; color: #38bdf8; font-family: var(--font-mono);">0.963 / 0.988</span>
+            </div>
+            <div class="ai-comparison-card">
+              <span class="metric-label">Training Records</span>
+              <span style="font-size: 1.25rem; font-weight: 700; color: #fbbf24; font-family: var(--font-mono);">15,400</span>
+            </div>
+            <div class="ai-comparison-card">
+              <span class="metric-label">Inference Latency</span>
+              <span style="font-size: 1.25rem; font-weight: 700; color: #a78bfa; font-family: var(--font-mono);">< 2.1 ms</span>
+            </div>
+          </div>
+
+          <!-- 3 Columns of AI Features -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.25rem; margin-top: 1.25rem;">
+            
+            <!-- Column 1: Predictive ML Hazard & Road Blockage Classifier -->
+            <div class="panel" style="background: rgba(15, 23, 42, 0.6);">
+              <div class="panel-header">
+                <span class="panel-title" style="color: #38bdf8; font-size: 0.9rem;">
+                  1. Supervised ML Hazard Classifier
+                </span>
+                <span class="ai-metric-pill">Sigmoid σ(z)</span>
+              </div>
+              <p style="font-size: 0.78rem; color: var(--text-secondary);">
+                Multi-variate logistic model predicting road blockage probability $P(\text{Blockage})$ from real-time environmental telemetry:
+              </p>
+
+              <div class="slider-group">
+                <div class="slider-header">
+                  <span>Rainfall Intensity</span>
+                  <span id="aiRainVal" class="slider-val">75 mm/h</span>
+                </div>
+                <input type="range" id="aiRain" class="slider-input" min="0" max="150" value="75">
+              </div>
+
+              <div class="slider-group">
+                <div class="slider-header">
+                  <span>Flood Water Surge</span>
+                  <span id="aiWaterVal" class="slider-val">1.8 m</span>
+                </div>
+                <input type="range" id="aiWater" class="slider-input" min="0" max="5.0" step="0.1" value="1.8">
+              </div>
+
+              <div class="slider-group">
+                <div class="slider-header">
+                  <span>Seismic Tremor (Richter)</span>
+                  <span id="aiSeismicVal" class="slider-val">2.5 M</span>
+                </div>
+                <input type="range" id="aiSeismic" class="slider-input" min="0" max="8.0" step="0.1" value="2.5">
+              </div>
+
+              <div class="slider-group">
+                <div class="slider-header">
+                  <span>Road Elevation / Drainage</span>
+                  <span id="aiElevVal" class="slider-val">20 m</span>
+                </div>
+                <input type="range" id="aiElevation" class="slider-input" min="0" max="100" value="20">
+              </div>
+
+              <!-- Live Prediction Result Box -->
+              <div style="background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-active); border-radius: var(--radius-md); padding: 0.85rem; margin-top: 0.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-size: 0.75rem; color: var(--text-muted);">P(Road Blockage):</span>
+                  <span id="aiProbText" style="font-family: var(--font-mono); font-weight: 700; color: #f43f5e; font-size: 1rem;">74.2%</span>
+                </div>
+                <div class="ai-prob-gauge">
+                  <div id="aiProbGaugeFill" class="ai-prob-fill" style="width: 74%;"></div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; margin-top: 0.65rem; font-size: 0.78rem;">
+                  <span>Predicted Risk: <b id="aiRiskScoreText" style="color: #fbbf24;">7.8 / 10</b></span>
+                  <span>Classification: <b id="aiStatusBadge" class="badge-fail">BLOCKED</b></span>
+                </div>
+              </div>
+
+              <button id="btnApplyAiPredictions" class="btn btn-primary btn-block" style="margin-top: 0.5rem; font-size: 0.8rem;">
+                ⚡ Apply AI Inferences to Graph Edges
+              </button>
+            </div>
+
+            <!-- Column 2: Reinforcement Learning Showdown (Q-Learning Agent) -->
+            <div class="panel" style="background: rgba(15, 23, 42, 0.6);">
+              <div class="panel-header">
+                <span class="panel-title" style="color: #a78bfa; font-size: 0.9rem;">
+                  2. Q-Learning RL Navigation Agent
+                </span>
+                <span class="ai-metric-pill">Bellman Eq</span>
+              </div>
+              <p style="font-size: 0.78rem; color: var(--text-secondary);">
+                Reinforcement Learning agent learns dynamic rescue policy through environmental rewards ($+150$ Hospital, $-200$ Blocked obstacle):
+              </p>
+
+              <div class="code-box" style="font-size: 0.72rem; padding: 0.65rem; margin-bottom: 0.5rem;">
+Q(s, a) ← Q(s, a) + α[R + γ max Q(s', a') - Q(s, a)]
+• α = 0.25 (Learning Rate)
+• γ = 0.85 (Discount Factor)
+• ε = 0.60 ➔ 0.05 (Exploration Decay)
+              </div>
+
+              <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <button id="btnTrainQLearning" class="btn btn-primary" style="flex: 1; font-size: 0.78rem;">
+                  ▶ Train RL Agent (200 Episodes)
+                </button>
+              </div>
+
+              <div id="qLearningResultBox" class="code-box" style="max-height: 200px; font-size: 0.75rem;">
+Click "Train RL Agent" to simulate Q-learning exploration & exploitation convergence...
+              </div>
+
+              <div class="ai-comparison-card" style="margin-top: 0.5rem;">
+                <span style="font-size: 0.75rem; color: var(--accent-cyan); font-weight: 600;">DAA Dijkstra vs AI Q-Learning:</span>
+                <span style="font-size: 0.72rem; color: var(--text-secondary); line-height: 1.4;">
+                  • <b>Dijkstra (DAA)</b>: Guaranteed mathematically optimal O((V+E)log V).<br>
+                  • <b>Q-Learning (AI)</b>: Self-adapting to unknown probabilistic reward terrain.
+                </span>
+              </div>
+            </div>
+
+            <!-- Column 3: Natural Language Processing (NLP) SOS Triage -->
+            <div class="panel" style="background: rgba(15, 23, 42, 0.6);">
+              <div class="panel-header">
+                <span class="panel-title" style="color: #34d399; font-size: 0.9rem;">
+                  3. NLP SOS Dispatch Triage
+                </span>
+                <span class="ai-metric-pill">TF-IDF & BERT</span>
+              </div>
+              <p style="font-size: 0.78rem; color: var(--text-secondary);">
+                Analyzes live distress calls and field civilian transcripts to extract casualty severity and urgency score:
+              </p>
+
+              <textarea id="nlpInputText" class="form-input" style="height: 85px; font-size: 0.78rem; line-height: 1.4; margin-bottom: 0.5rem;">MAYDAY! Flash flood rising near Metro Station. 15 civilians trapped on rooftop, elderly drowning, water 2 meters deep, immediate medical evacuation needed!</textarea>
+
+              <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <button id="btnRunNlpTriage" class="btn btn-secondary" style="flex: 1; font-size: 0.78rem;">
+                  🔍 Analyze Distress Call via NLP
+                </button>
+              </div>
+
+              <div id="nlpResultBox" class="code-box" style="max-height: 180px; font-size: 0.75rem;">
+Click "Analyze Distress Call" to run NLP tokenization and sentiment/urgency triage...
+              </div>
+
+              <button id="btnAutoDeployNlp" class="btn btn-success btn-block" style="margin-top: 0.5rem; font-size: 0.78rem;">
+                🚑 Auto-Deploy Rescue Route For This SOS
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ========================================
+           TAB 1: INCIDENT MANAGEMENT (M2)
+           ======================================== -->
+      <section id="tab-incidents" class="tab-view">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <span class="panel-title">🚨 Disaster Incident Management (M2)</span>
+              <p style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                Records disaster events, urgency levels, source incident zones, and dispatches rescue requests.
+              </p>
+            </div>
+            <button id="btnDispatchActiveIncident" class="btn btn-primary">
+              🚀 Deploy Route Planner For Selected Incident
+            </button>
+          </div>
+
+          <!-- Add Incident Bar -->
+          <div style="display: grid; grid-template-columns: 2fr 2fr 2fr 3fr auto; gap: 0.5rem; align-items: end;">
+            <div class="form-group">
+              <label class="form-label">Incident ID</label>
+              <input type="text" id="newIncidentId" class="form-input" placeholder="e.g. INC-04">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Disaster Type</label>
+              <select id="newIncidentType" class="form-select">
+                <option value="Flash Flood">Flash Flood</option>
+                <option value="Earthquake">Earthquake</option>
+                <option value="Landslide">Landslide</option>
+                <option value="Cyclone">Cyclone Alert</option>
+                <option value="Structural Collapse">Structural Collapse</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Urgency / Severity</label>
+              <select id="newIncidentSeverity" class="form-select">
+                <option value="CRITICAL">CRITICAL</option>
+                <option value="HIGH" selected>HIGH</option>
+                <option value="MODERATE">MODERATE</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Description / Location</label>
+              <input type="text" id="newIncidentDesc" class="form-input" placeholder="e.g. River causeway submerged">
+            </div>
+            <button id="btnAddIncident" class="btn btn-success" style="padding: 0.55rem 0.85rem;">+ Log Event</button>
+          </div>
+
+          <div class="data-table-wrapper" style="margin-top: 1rem;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Incident ID</th>
+                  <th>Disaster Type</th>
+                  <th>Severity Level</th>
+                  <th>Location / Description</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="incidentsTbody"></tbody>
+            </table>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ========================================
+           TAB 2: RESCUE OPERATIONS (LIVE PLANNER - M7)
+           ======================================== -->
+      <section id="tab-ops" class="tab-view">
+        <div class="ops-grid">
+          
+          <!-- Left Column: Controls & Mission Parameters -->
+          <aside class="panel">
+            <div class="panel-header">
+              <span class="panel-title">🎯 Rescue Request Parameters</span>
+              <span class="panel-badge">M2 & M7</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="incidentType">Disaster Incident Type (M2)</label>
+              <select id="incidentType" class="form-select">
+                <option value="flood">Flash Floods & Inundation</option>
+                <option value="earthquake">High-Magnitude Earthquake</option>
+                <option value="landslide">Hill Sector Landslide</option>
+                <option value="cyclone">Coastal Cyclone Alert</option>
+                <option value="fire">Urban Industrial Fire</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="incidentSeverity">Urgency / Severity Level</label>
+              <select id="incidentSeverity" class="form-select">
+                <option value="critical">CRITICAL (Immediate Evacuation)</option>
+                <option value="high" selected>HIGH (Priority Route Required)</option>
+                <option value="moderate">MODERATE (Standard Logistics)</option>
+              </select>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+              <div class="form-group">
+                <label class="form-label" for="selectSource">Source (S)</label>
+                <select id="selectSource" class="form-select"></select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="selectTarget">Destination (T)</label>
+                <select id="selectTarget" class="form-select"></select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="selectAlgorithm">Primary Algorithm Engine (M7)</label>
+              <select id="selectAlgorithm" class="form-select">
+                <option value="dijkstra" selected>Dijkstra's Algorithm (Min-Heap) [O((V+E)log V)]</option>
+                <option value="bellmanFord">Bellman-Ford Algorithm [O(VE)]</option>
+                <option value="floyd">Floyd-Warshall (All-Pairs DP) [O(V³)]</option>
+                <option value="bfs">Breadth-First Search (Hop Count) [O(V+E)]</option>
+              </select>
+            </div>
+
+            <!-- Multi-Criteria Cost Engine Sliders (Section 6.4) -->
+            <div class="panel-header" style="margin-top: 0.25rem;">
+              <span class="panel-title" style="font-size: 0.85rem;">⚖️ Multi-Criteria Weights (M6)</span>
+              <span class="panel-badge">Cost(e)</span>
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-header">
+                <span>α • Travel Time</span>
+                <span id="valAlpha" class="slider-val">1.0</span>
+              </div>
+              <input type="range" id="sliderAlpha" class="slider-input" min="0" max="3" step="0.1" value="1.0">
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-header">
+                <span>β • Distance</span>
+                <span id="valBeta" class="slider-val">0.8</span>
+              </div>
+              <input type="range" id="sliderBeta" class="slider-input" min="0" max="3" step="0.1" value="0.8">
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-header">
+                <span>γ • Hazard / Risk</span>
+                <span id="valGamma" class="slider-val">1.5</span>
+              </div>
+              <input type="range" id="sliderGamma" class="slider-input" min="0" max="5" step="0.1" value="1.5">
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-header">
+                <span>δ • Restriction Penalty</span>
+                <span id="valDelta" class="slider-val">1.0</span>
+              </div>
+              <input type="range" id="sliderDelta" class="slider-input" min="0" max="3" step="0.1" value="1.0">
+            </div>
+
+            <button id="btnComputeRoute" class="btn btn-primary btn-block">
+              🚀 Calculate Route (Best Route)
+            </button>
+
+            <!-- Quick Action Buttons -->
+            <div style="display: flex; gap: 0.5rem;">
+              <button id="btnToggleBlockedWorkedExample" class="btn btn-secondary" style="flex: 1; font-size: 0.75rem;" title="Simulates blocking edge B-C from page 18 of report">
+                ⚠️ Toggle B-C Block
+              </button>
+              <button id="btnResetGraphState" class="btn btn-secondary" style="font-size: 0.75rem;">
+                🔄 Reset
+              </button>
+            </div>
+          </aside>
+
+          <!-- Center Column: Canvas Graph Interactive Visualizer -->
+          <div class="canvas-container">
+            <div class="canvas-toolbar">
+              <button id="btnZoomIn" class="toolbar-btn" title="Zoom in">🔍+</button>
+              <button id="btnZoomOut" class="toolbar-btn" title="Zoom out">🔍-</button>
+              <button id="btnFitView" class="toolbar-btn" title="Fit network to view">🎯 Fit</button>
+              <button id="btnToggleAnim" class="toolbar-btn" title="Toggle route flow animation">✨ Flow</button>
+            </div>
+
+            <canvas id="graphCanvas" width="900" height="640"></canvas>
+
+            <div class="canvas-hud">
+              <div class="hud-pill">
+                <span>💡 <b>Tip:</b> Click any edge to toggle OPEN ➔ RESTRICTED ➔ BLOCKED. Drag nodes to reposition.</span>
+              </div>
+
+              <!-- Step by Step Playback HUD -->
+              <div id="stepPlaybackBar" class="step-playback-bar" style="display: none;">
+                <span style="font-size: 0.75rem; color: var(--accent-cyan);">Step: <b id="stepCounter">0/0</b></span>
+                <button id="btnStepPrev">⏮ Prev</button>
+                <button id="btnStepPlay">▶ Play</button>
+                <button id="btnStepNext">Next ⏭</button>
+                <button id="btnStepExit" style="color: #f87171;">✖ Close</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Mission Results & Route Metrics (M10, Sec 15.3) -->
+          <aside class="panel">
+            <div class="panel-header">
+              <span class="panel-title">📋 Result / Report (Section 15.3)</span>
+              <span id="routeFeasibilityBadge" class="badge-pass">READY</span>
+            </div>
+
+            <div id="routeStatusBanner" style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4;">
+              Select source and destination, then click <b>Calculate Route</b>.
+            </div>
+
+            <!-- Summary Metrics Cards -->
+            <div class="metrics-grid">
+              <div class="metric-card highlight">
+                <span class="metric-label">Total Route Cost</span>
+                <span id="metricCost" class="metric-val">--</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">Estimated Time</span>
+                <span id="metricTime" class="metric-val">--</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">Total Distance</span>
+                <span id="metricDist" class="metric-val">--</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">Risk Score</span>
+                <span id="metricRisk" class="metric-val">--</span>
+              </div>
+            </div>
+
+            <div class="metric-card" style="padding: 0.5rem 0.75rem;">
+              <div style="display: flex; justify-content: space-between; font-size: 0.75rem;">
+                <span style="color: var(--text-muted);">Runtime & Complexity</span>
+                <span id="metricComplexity" style="font-family: var(--font-mono); color: var(--accent-cyan);">O((V+E)log V)</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-top: 0.2rem;">
+                <span style="color: var(--text-muted);">Engine Execution Time</span>
+                <span id="metricExecTime" style="font-family: var(--font-mono); color: var(--accent-emerald);">-- ms</span>
+              </div>
+            </div>
+
+            <!-- Route Sequence Path -->
+            <div class="form-group">
+              <label class="form-label">Ordered Best Route Path (M7)</label>
+              <div id="routePathSequence" class="route-sequence-box">
+                Awaiting calculation...
+              </div>
+            </div>
+
+            <!-- Turn-by-Turn Breakdown -->
+            <div class="form-group" style="flex: 1; min-height: 140px; display: flex; flex-direction: column;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                <label class="form-label" style="margin-bottom: 0;">Turn-by-Turn Route Breakdown</label>
+                <button id="btnStartStepTrace" class="btn btn-secondary" style="padding: 0.2rem 0.5rem; font-size: 0.7rem;">
+                  ▶ Animate Steps
+                </button>
+              </div>
+              <div style="flex: 1; overflow-y: auto; max-height: 180px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">
+                <table class="turn-by-turn-table">
+                  <thead>
+                    <tr>
+                      <th>Segment</th>
+                      <th>Dist</th>
+                      <th>Time</th>
+                      <th>Risk</th>
+                      <th>Cost</th>
+                    </tr>
+                  </thead>
+                  <tbody id="turnByTurnTbody">
+                    <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No active route computed</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </aside>
+
+        </div>
+      </section>
+
+      <!-- ========================================
+           TAB 3: NETWORK & GRAPH MANAGER (M3, M4, M5)
+           ======================================== -->
+      <section id="tab-network" class="tab-view">
+        <div class="network-grid">
+          
+          <!-- Left: Location (Vertex) Manager -->
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">📍 Location (Vertex) Management (M3)</span>
+              <span class="panel-badge">O(V)</span>
+            </div>
+
+            <div style="display: flex; gap: 0.5rem;">
+              <input type="text" id="inputSearchLoc" class="form-input" placeholder="Search location name...">
+              <button id="btnBinarySearchLoc" class="btn btn-secondary" title="Execute O(log N) Binary Search">Binary Search</button>
+              <button id="btnLinearSearchLoc" class="btn btn-secondary" title="Execute O(N) Linear Search">Linear Search</button>
+            </div>
+            <div id="searchResultNote" style="font-size: 0.75rem; color: var(--accent-cyan); min-height: 18px;"></div>
+
+            <!-- Add Location Form -->
+            <div style="display: grid; grid-template-columns: 2fr 2fr 3fr auto; gap: 0.5rem; align-items: end;">
+              <div class="form-group">
+                <label class="form-label">ID</label>
+                <input type="text" id="newLocId" class="form-input" placeholder="e.g. F">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Name</label>
+                <input type="text" id="newLocName" class="form-input" placeholder="e.g. West Clinic">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Type</label>
+                <select id="newLocType" class="form-select">
+                  <option value="base">Rescue Base</option>
+                  <option value="hospital">Hospital / Clinic</option>
+                  <option value="incident">Incident Site</option>
+                  <option value="shelter">Evacuation Shelter</option>
+                  <option value="junction">Junction / Crossing</option>
+                  <option value="supply">Supply Depot</option>
+                </select>
+              </div>
+              <button id="btnAddLocation" class="btn btn-success" style="padding: 0.55rem 0.85rem;">+ Add</button>
+            </div>
+
+            <div class="data-table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="locationsTbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Right: Road / Edge Management (M4) & Adjacency Representations (M5) -->
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">🛣️ Road / Edge Management (M4)</span>
+              <span class="panel-badge">O(E)</span>
+            </div>
+
+            <!-- Add Edge Form -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr auto; gap: 0.4rem; align-items: end;">
+              <div class="form-group">
+                <label class="form-label">From</label>
+                <select id="newEdgeFrom" class="form-select"></select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">To</label>
+                <select id="newEdgeTo" class="form-select"></select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Dist (km)</label>
+                <input type="number" id="newEdgeDist" class="form-input" value="5" min="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Time (m)</label>
+                <input type="number" id="newEdgeTime" class="form-input" value="6" min="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Risk (1-10)</label>
+                <input type="number" id="newEdgeRisk" class="form-input" value="2" min="1" max="10">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Status</label>
+                <select id="newEdgeStatus" class="form-select">
+                  <option value="OPEN">OPEN</option>
+                  <option value="RESTRICTED">RESTRICTED</option>
+                  <option value="BLOCKED">BLOCKED</option>
+                </select>
+              </div>
+              <button id="btnAddEdge" class="btn btn-success" style="padding: 0.55rem 0.85rem;">+ Add</button>
+            </div>
+
+            <div class="data-table-wrapper" style="max-height: 220px;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Connection</th>
+                    <th>Dist / Time</th>
+                    <th>Risk</th>
+                    <th>Status</th>
+                    <th>Calculated Cost</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="edgesTbody"></tbody>
+              </table>
+            </div>
+
+            <!-- Graph Data Structure Representations (M5) -->
+            <div class="panel-header" style="margin-top: 0.5rem;">
+              <span class="panel-title" style="font-size: 0.85rem;">📊 Data Representation (Section 6.2 & 6.3)</span>
+              <div style="display: flex; gap: 0.35rem;">
+                <button id="btnViewAdjList" class="btn btn-secondary" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;">Adjacency List O(V+E)</button>
+                <button id="btnViewAdjMatrix" class="btn btn-secondary" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;">Adjacency Matrix O(V²)</button>
+              </div>
+            </div>
+
+            <div id="representationContainer" class="matrix-display" style="max-height: 200px;">
+              Awaiting selection...
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ========================================
+           TAB 4: INFRASTRUCTURE MST (M8)
+           ======================================== -->
+      <section id="tab-mst" class="tab-view">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <span class="panel-title">🌲 Emergency Infrastructure Connectivity (M8)</span>
+              <p style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                Section 8.4: Minimum-Cost Spanning Tree algorithms to interconnect all shelters, hospitals and command bases with minimum total infrastructure repair cost.
+              </p>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+              <button id="btnRunPrim" class="btn btn-primary">Run Prim's Algorithm (Heap)</button>
+              <button id="btnRunKruskal" class="btn btn-secondary">Run Kruskal's Algorithm (DSU)</button>
+            </div>
+          </div>
+
+          <div class="mst-compare-grid">
+            <!-- Prim Output Card -->
+            <div class="algo-card">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-weight: 600; color: var(--accent-cyan);">Prim's Algorithm</span>
+                <span class="panel-badge">O((V + E) log V)</span>
+              </div>
+              <p style="font-size: 0.8rem; color: var(--text-secondary);">
+                Grows a spanning tree from a chosen vertex by greedily extracting minimum-weight frontier edges via Min-Priority Queue.
+              </p>
+              <div class="metrics-grid">
+                <div class="metric-card">
+                  <span class="metric-label">Total MST Cost</span>
+                  <span id="primCostVal" class="metric-val">--</span>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-label">Tree Edges</span>
+                  <span id="primEdgesCount" class="metric-val">--</span>
+                </div>
+              </div>
+              <div id="primStatusNote" style="font-size: 0.8rem; color: var(--accent-emerald);"></div>
+              <div style="max-height: 220px; overflow-y: auto; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">
+                <table class="data-table">
+                  <thead>
+                    <tr><th>From</th><th>To</th><th>Weight</th><th>Status</th></tr>
+                  </thead>
+                  <tbody id="primEdgesTbody"><tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Click "Run Prim's Algorithm"</td></tr></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Kruskal Output Card -->
+            <div class="algo-card">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-weight: 600; color: #fbbf24;">Kruskal's Algorithm</span>
+                <span class="panel-badge">O(E log E)</span>
+              </div>
+              <p style="font-size: 0.8rem; color: var(--text-secondary);">
+                Sorts all edges globally by cost, adding non-cycle edges using Disjoint Set Union (DSU with Path Compression).
+              </p>
+              <div class="metrics-grid">
+                <div class="metric-card">
+                  <span class="metric-label">Total MST Cost</span>
+                  <span id="kruskalCostVal" class="metric-val">--</span>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-label">Tree Edges</span>
+                  <span id="kruskalEdgesCount" class="metric-val">--</span>
+                </div>
+              </div>
+              <div id="kruskalStatusNote" style="font-size: 0.8rem; color: var(--accent-emerald);"></div>
+              <div style="max-height: 220px; overflow-y: auto; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">
+                <table class="data-table">
+                  <thead>
+                    <tr><th>From</th><th>To</th><th>Weight</th><th>Status</th></tr>
+                  </thead>
+                  <tbody id="kruskalEdgesTbody"><tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Click "Run Kruskal's Algorithm"</td></tr></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ========================================
+           TAB 5: DAA ALGORITHM LAB (M9)
+           ======================================== -->
+      <section id="tab-lab" class="tab-view">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <span class="panel-title">🧪 DAA Algorithm Laboratory (M9)</span>
+              <p style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                Interactive implementations and testbeds for all DAA curriculum topics: Sorting, Greedy, DP, Backtracking, Branch & Bound, and Huffman Coding.
+              </p>
+            </div>
+          </div>
+
+          <div class="lab-nav">
+            <button class="lab-tab-btn active" data-lab="lab-sort">1. Sorting Benchmark</button>
+            <button class="lab-tab-btn" data-lab="lab-knapsack">2. Knapsack (0/1 vs Fractional)</button>
+            <button class="lab-tab-btn" data-lab="lab-dp">3. Dynamic Programming (Binomial, Warshall, OBST)</button>
+            <button class="lab-tab-btn" data-lab="lab-backtracking">4. Backtracking (Coloring, N-Queens, Subsets)</button>
+            <button class="lab-tab-btn" data-lab="lab-bb">5. Branch & Bound (TSP, Assignment, Job Sequencing)</button>
+            <button class="lab-tab-btn" data-lab="lab-text">6. Huffman & String Search (KMP & Rabin-Karp)</button>
+            <button class="lab-tab-btn" data-lab="lab-ds">7. Fundamental Data Structures (Lists, Stacks, Trees)</button>
+            <button class="lab-tab-btn" data-lab="lab-complexity">8. Complexity Classes (P, NP, NP-Complete)</button>
+          </div>
+
+          <!-- Lab 1: Sorting Benchmark -->
+          <div id="lab-sort" class="lab-section active">
+            <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
+              <label style="font-size: 0.85rem;">Array Size (N):</label>
+              <input type="range" id="sortArraySize" class="slider-input" style="width: 200px;" min="100" max="2000" step="100" value="500">
+              <span id="sortArraySizeVal" class="slider-val">500</span>
+              <button id="btnRunSortBench" class="btn btn-primary" style="padding: 0.4rem 0.9rem;">▶ Run Comparative Benchmark</button>
+            </div>
+            <div class="data-table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Algorithm</th>
+                    <th>Paradigm</th>
+                    <th>Time Complexity</th>
+                    <th>Comparisons</th>
+                    <th>Runtime (ms)</th>
+                  </tr>
+                </thead>
+                <tbody id="sortBenchTbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Lab 2: Knapsack Logistics -->
+          <div id="lab-knapsack" class="lab-section">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+              <div>
+                <h4 style="color: var(--accent-cyan); margin-bottom: 0.5rem;">Greedy Fractional Knapsack (Unit 2)</h4>
+                <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.75rem;">Divisible disaster supplies (Rations, Fuel, Purified Water) sorted by value/weight ratio.</p>
+                <button id="btnRunFracKnapsack" class="btn btn-secondary" style="margin-bottom: 0.75rem;">Run Fractional Knapsack</button>
+                <div id="fracKnapsackOutput" class="code-box">Click run to calculate...</div>
+              </div>
+              <div>
+                <h4 style="color: #fbbf24; margin-bottom: 0.5rem;">0/1 Knapsack via Dynamic Programming (Unit 3)</h4>
+                <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.75rem;">Indivisible high-priority rescue equipment packed within rescue boat payload capacity.</p>
+                <button id="btnRun01Knapsack" class="btn btn-secondary" style="margin-bottom: 0.75rem;">Run 0/1 Knapsack DP</button>
+                <div id="knapsack01Output" class="code-box">Click run to calculate...</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lab 3: DP (Binomial, Warshall, OBST) -->
+          <div id="lab-dp" class="lab-section">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+              <div>
+                <h4 style="color: var(--accent-cyan); margin-bottom: 0.5rem;">Binomial Coefficient DP (C(n, k))</h4>
+                <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.75rem;">
+                  <label>n:</label><input type="number" id="dpN" class="form-input" style="width: 70px;" value="8" min="0" max="20">
+                  <label>k:</label><input type="number" id="dpK" class="form-input" style="width: 70px;" value="4" min="0" max="20">
+                  <button id="btnRunBinomial" class="btn btn-secondary">Compute DP Table</button>
+                </div>
+                <div id="dpBinomialOutput" class="code-box">Result will appear here...</div>
+              </div>
+              <div>
+                <h4 style="color: var(--accent-indigo); margin-bottom: 0.5rem;">Warshall's Transitive Closure (Reachability)</h4>
+                <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.75rem;">Computes boolean reachability matrix R[i][j] across all disaster network locations.</p>
+                <button id="btnRunWarshall" class="btn btn-secondary" style="margin-bottom: 0.75rem;">Compute Warshall Matrix</button>
+                <div id="warshallOutput" class="code-box">Click compute to display matrix...</div>
+              </div>
+            </div>
+            <div style="margin-top: 1.25rem;">
+              <h4 style="color: #38bdf8; margin-bottom: 0.5rem;">Optimal Binary Search Tree (OBST - Unit 3.3)</h4>
+              <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Cost-aware indexing of frequently searched rescue location keys using dynamic programming.</p>
+              <button id="btnRunObst" class="btn btn-secondary" style="margin-bottom: 0.5rem;">Compute Optimal BST Cost</button>
+              <div id="obstOutput" class="code-box">Click button to compute...</div>
+            </div>
+          </div>
+
+          <!-- Lab 4: Backtracking -->
+          <div id="lab-backtracking" class="lab-section">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+              <div>
+                <h4 style="color: var(--accent-emerald); margin-bottom: 0.5rem;">Rescue Zone Graph Coloring</h4>
+                <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.75rem;">Assigns non-interfering radio frequencies (m colors) to adjacent rescue sectors.</p>
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
+                  <label>Colors (m):</label>
+                  <input type="number" id="colorCount" class="form-input" style="width: 70px;" value="3" min="1" max="6">
+                  <button id="btnRunGraphColor" class="btn btn-secondary">Run m-Coloring</button>
+                </div>
+                <div id="colorOutput" class="code-box">Click run to solve...</div>
+              </div>
+              <div>
+                <h4 style="color: #f43f5e; margin-bottom: 0.5rem;">N-Queens Problem (N=4 to 8)</h4>
+                <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.75rem;">Classic syllabus backtracking problem for constraint satisfaction.</p>
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
+                  <label>N:</label>
+                  <input type="number" id="nQueensN" class="form-input" style="width: 70px;" value="4" min="4" max="8">
+                  <button id="btnRunNQueens" class="btn btn-secondary">Solve N-Queens</button>
+                </div>
+                <div id="nQueensOutput" class="code-box">Click solve to display solution...</div>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.25rem;">
+              <div>
+                <h4 style="color: #fbbf24; margin-bottom: 0.5rem;">Hamiltonian Cycle Detection</h4>
+                <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Finds a cycle visiting every disaster zone exactly once.</p>
+                <button id="btnRunHamiltonian" class="btn btn-secondary" style="margin-bottom: 0.5rem;">Check Hamiltonian Cycle</button>
+                <div id="hamiltonianOutput" class="code-box">Click to check...</div>
+              </div>
+              <div>
+                <h4 style="color: #38bdf8; margin-bottom: 0.5rem;">Sum of Subsets (Rescue Capability Matching)</h4>
+                <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Matches team capabilities to an exact evacuation quota.</p>
+                <button id="btnRunSubsets" class="btn btn-secondary" style="margin-bottom: 0.5rem;">Find Subset Combinations</button>
+                <div id="subsetsOutput" class="code-box">Click to solve...</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lab 5: Branch & Bound -->
+          <div id="lab-bb" class="lab-section">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+              <div>
+                <h4 style="color: var(--accent-cyan); margin-bottom: 0.5rem;">Travelling Salesperson (TSP) via Branch & Bound</h4>
+                <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.75rem;">Disaster Inspection Team visits multiple sites and returns to base with minimum distance.</p>
+                <button id="btnRunTsp" class="btn btn-secondary" style="margin-bottom: 0.75rem;">Solve TSP Inspection Tour</button>
+                <div id="tspOutput" class="code-box">Click solve to execute B&B search...</div>
+              </div>
+              <div>
+                <h4 style="color: #fbbf24; margin-bottom: 0.5rem;">Assignment Problem (Branch & Bound - Unit 3.5)</h4>
+                <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.75rem;">Assigns specialized rescue units to emergency sectors with minimum response penalty.</p>
+                <button id="btnRunAssignment" class="btn btn-secondary" style="margin-bottom: 0.75rem;">Solve Unit Assignment</button>
+                <div id="assignmentOutput" class="code-box">Click solve to execute assignment...</div>
+              </div>
+            </div>
+            <div style="margin-top: 1.25rem;">
+              <h4 style="color: #a78bfa; margin-bottom: 0.5rem;">Job Sequencing with Deadlines (Self-Study Topic)</h4>
+              <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Schedules urgent relief dispatches before time-windows expire.</p>
+              <button id="btnRunJobSeq" class="btn btn-secondary" style="margin-bottom: 0.5rem;">Schedule Rescue Tasks</button>
+              <div id="jobSeqOutput" class="code-box">Click to run...</div>
+            </div>
+          </div>
+
+          <!-- Lab 6: Huffman & String Search -->
+          <div id="lab-text" class="lab-section">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+              <div>
+                <h4 style="color: var(--accent-cyan); margin-bottom: 0.5rem;">Huffman Coding (Greedy Compression - Unit 2.5)</h4>
+                <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Compresses emergency broadcast dispatches using optimal prefix trees.</p>
+                <textarea id="huffmanText" class="form-input" style="height: 65px; margin-bottom: 0.5rem;">EMERGENCY EVACUATION IN PROGRESS. FLASH FLOOD BRIDGE COLLAPSED.</textarea>
+                <button id="btnRunHuffman" class="btn btn-secondary" style="margin-bottom: 0.5rem;">Compress Message</button>
+                <div id="huffmanOutput" class="code-box">Result will appear here...</div>
+              </div>
+              <div>
+                <h4 style="color: var(--accent-indigo); margin-bottom: 0.5rem;">String Matching: KMP & Rabin-Karp</h4>
+                <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Knuth-Morris-Pratt O(N+M) & Rabin-Karp Rolling Hash keyword scanning.</p>
+                <input type="text" id="kmpPattern" class="form-input" value="COLLAPSED" style="margin-bottom: 0.5rem;">
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                  <button id="btnRunKmp" class="btn btn-secondary">Scan via KMP</button>
+                  <button id="btnRunRabinKarp" class="btn btn-secondary">Scan via Rabin-Karp</button>
+                </div>
+                <div id="kmpOutput" class="code-box">Result will appear here...</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lab 7: Fundamental Data Structures (Unit 1.5) -->
+          <div id="lab-ds" class="lab-section">
+            <h4 style="color: var(--accent-cyan); margin-bottom: 0.5rem;">Fundamental Data Structures Simulator (Unit 1.5)</h4>
+            <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.75rem;">Interactive overview of Lists (Singly, Doubly, Circular), Stacks, Queues, Graphs, BST, and AVL Trees.</p>
+            <button id="btnRunDsSim" class="btn btn-secondary" style="margin-bottom: 0.75rem;">Simulate Data Structures</button>
+            <div id="dsSimOutput" class="code-box">Click to simulate...</div>
+          </div>
+
+          <!-- Lab 8: Complexity Classes (Unit 3.7) -->
+          <div id="lab-complexity" class="lab-section">
+            <h4 style="color: #fbbf24; margin-bottom: 0.5rem;">Types of Complexity Classes (Unit 3.7)</h4>
+            <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.75rem;">Categorization of DAA problems into P, NP, NP-Hard, NP-Complete, and co-NP.</p>
+            <div id="complexityClassesOutput" class="code-box">Loading classifications...</div>
+          </div>
+
+
+        </div>
+      </section>
+
+      <!-- ========================================
+           TAB 6: RELATIONAL DATABASE & SCHEMA (SECTION 23)
+           ======================================== -->
+      <section id="tab-db" class="tab-view">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <span class="panel-title">🗄️ Relational Database & Entity Records (Section 23)</span>
+              <p style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                Official system schema implementing the 7 core tables: users, incidents, locations, edges, rescue_requests, route_results, and route_steps.
+              </p>
+            </div>
+          </div>
+
+          <!-- Table Selector Buttons -->
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+            <button class="lab-tab-btn active" data-db-tab="users">1. users</button>
+            <button class="lab-tab-btn" data-db-tab="incidents">2. incidents</button>
+            <button class="lab-tab-btn" data-db-tab="locations">3. locations</button>
+            <button class="lab-tab-btn" data-db-tab="edges">4. edges</button>
+            <button class="lab-tab-btn" data-db-tab="rescue_requests">5. rescue_requests</button>
+            <button class="lab-tab-btn" data-db-tab="route_results">6. route_results</button>
+            <button class="lab-tab-btn" data-db-tab="route_steps">7. route_steps</button>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <h4 id="dbTableTitle" style="color: var(--accent-cyan); font-size: 0.95rem;">Table: users</h4>
+            <span id="dbTableCount" class="panel-badge">3 Records</span>
+          </div>
+
+          <div class="data-table-wrapper" style="max-height: 280px;">
+            <table class="data-table">
+              <thead id="dbTableHead"></thead>
+              <tbody id="dbTableBody"></tbody>
+            </table>
+          </div>
+
+          <!-- SQL Schema Definition Viewer -->
+          <div class="panel-header" style="margin-top: 1.25rem;">
+            <span class="panel-title" style="font-size: 0.85rem;">💾 SQL DDL Schema Definitions</span>
+          </div>
+          <div class="code-box" style="max-height: 180px;">
+CREATE TABLE users (user_id VARCHAR(10) PRIMARY KEY, name VARCHAR(50), role VARCHAR(30), status VARCHAR(20));
+CREATE TABLE incidents (incident_id VARCHAR(10) PRIMARY KEY, disaster_type VARCHAR(30), location_id VARCHAR(10), severity VARCHAR(20), description TEXT, status VARCHAR(20), created_at TIMESTAMP);
+CREATE TABLE locations (location_id VARCHAR(10) PRIMARY KEY, name VARCHAR(50), type VARCHAR(30), latitude FLOAT, longitude FLOAT, status VARCHAR(20));
+CREATE TABLE edges (edge_id VARCHAR(20) PRIMARY KEY, from_location VARCHAR(10), to_location VARCHAR(10), distance FLOAT, travel_time FLOAT, risk FLOAT, capacity INT, status VARCHAR(20));
+CREATE TABLE rescue_requests (request_id VARCHAR(10) PRIMARY KEY, incident_id VARCHAR(10), source_location VARCHAR(10), destination_location VARCHAR(10), priority VARCHAR(20), created_at TIMESTAMP);
+CREATE TABLE route_results (result_id VARCHAR(10) PRIMARY KEY, request_id VARCHAR(10), algorithm VARCHAR(30), total_cost FLOAT, total_distance FLOAT, total_time FLOAT, risk_score FLOAT, status VARCHAR(20), created_at TIMESTAMP);
+CREATE TABLE route_steps (step_id VARCHAR(20) PRIMARY KEY, result_id VARCHAR(10), sequence_no INT, location_id VARCHAR(10));
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ========================================
+           TAB 7: ER & DFD DIAGRAMS (SECTIONS 4 & 5)
+           ======================================== -->
+      <section id="tab-arch" class="tab-view">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <span class="panel-title">📐 System Architecture, ER Model & DFD Diagrams (Sections 4 & 5)</span>
+              <p style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                Official architectural artifacts: Entity-Relationship Model and Data Flow Diagrams (Level 0, Level 1, Level 2).
+              </p>
+            </div>
+          </div>
+
+          <!-- Section 4: ER Diagram -->
+          <div style="margin-bottom: 1.5rem;">
+            <h4 style="color: var(--accent-cyan); margin-bottom: 0.5rem;">1. Entity-Relationship (ER) Diagram (Section 4)</h4>
+            <div class="code-box" style="line-height: 1.8;">
+========================================================================================
+                          ENTITY-RELATIONSHIP (ER) MODEL
+========================================================================================
+
+    [ USER ] (user_id PK, name, role)
+        |
+        | 1
+        | creates / manages
+        v N
+    [ INCIDENT ] (incident_id PK, type, severity, location_id FK, status)
+        |
+        | 1
+        | generates
+        v N
+    [ RESCUE_REQUEST ] (request_id PK, incident_id FK, source_id FK, dest_id FK, priority)
+        |
+        | 1
+        | produces
+        v 1
+    [ ROUTE_RESULT ] (result_id PK, request_id FK, algorithm, total_cost, status)
+        |
+        | 1
+        | contains
+        v 1..N
+    [ ROUTE_STEP ] (step_id PK, result_id FK, sequence_no, location_id FK)
+        |
+        | N
+        | references
+        v 1
+    [ LOCATION ] (location_id PK, name, type, lat, lon, status)
+        ^ 1                                      ^ 1
+        | from_location FK                       | to_location FK
+        +------------------ [ EDGE ] ------------+
+                     (edge_id PK, distance, time, risk, capacity, status)
+========================================================================================
+            </div>
+          </div>
+
+          <!-- Section 5: DFD Diagrams -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <div>
+              <h4 style="color: #fbbf24; margin-bottom: 0.5rem;">2. DFD Level 0 — Context Diagram (Section 5.1)</h4>
+              <div class="code-box">
++------------------+
+| Rescue Operator  |
++--------+---------+
+         | incident + route request
+         v
++------------------------------------------+
+| DISASTER RESCUE PATH PLANNING SYSTEM     |
++--------------------+---------------------+
+                     | recommended path + cost
+                     v
++------------------+
+| Rescue Operator  |
++------------------+
+External data sources:
+• Road blockages / hazards
+• Network topology data
+              </div>
+            </div>
+
+            <div>
+              <h4 style="color: #34d399; margin-bottom: 0.5rem;">3. DFD Level 1 — Module Data Flow (Section 5.2)</h4>
+              <div class="code-box">
+Operator
+   ↓
+[P1 User Validation] ➔ D1: Users
+   ↓
+[P2 Incident & Location Manager] ➔ D2: Incidents / Locations
+   ↓
+[P3 Graph Builder] ➔ D3: Edges & Topology
+   ↓
+[P4 Algorithm Engine] (Dijkstra / Floyd / Bellman-Ford / Prim)
+   ↓
+[P5 Route Validator] (Check constraints & blockages)
+   ↓
+[P6 Result & Reporting]
+   ↓
+Operator (Displays Best Path)
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: 1.5rem;">
+            <h4 style="color: var(--accent-indigo); margin-bottom: 0.5rem;">4. DFD Level 2 — Route Planning Process (Section 5.3)</h4>
+            <div class="code-box">
+4.1 Read source & destination
+   ↓
+4.2 Load graph from database
+   ↓
+4.3 Evaluate edge status (OPEN / RESTRICTED / BLOCKED)
+   ↓
+4.4 Calculate combined edge cost: Cost(e) = α·Time + β·Dist + γ·Risk + δ·Penalty
+   ↓
+4.5 Initialize distances / priority queue (Min-Heap)
+   ↓
+4.6 Relax candidate edges: if dist[u] + w < dist[v]
+   ↓
+4.7 Destination reached?
+       ├── NO  ➔ Continue relaxation
+       └── YES ➔ 4.8 Reconstruct path from predecessors
+   ↓
+4.9 Validate feasibility & constraints
+   ↓
+4.10 Generate final route result & save to database
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ========================================
+           TAB 8: REPORTS & BENCHMARK (TC01-TC10)
+           ======================================== -->
+      <section id="tab-tests" class="tab-view">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <span class="panel-title">📊 Automated Test Suite & Comparative Study</span>
+              <p style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                Direct verification of Test Cases TC01 through TC10 from Section 14.1 of the DAA Project Report.
+              </p>
+            </div>
+            <button id="btnRunAllTests" class="btn btn-primary">▶ Run All 10 Test Cases</button>
+          </div>
+
+          <div class="data-table-wrapper" style="margin-top: 1rem;">
+            <table class="test-suite-table">
+              <thead>
+                <tr>
+                  <th>Test ID</th>
+                  <th>Scenario Description</th>
+                  <th>Algorithm Tested</th>
+                  <th>Expected Result</th>
+                  <th>Actual Result</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="testSuiteTbody"></tbody>
+            </table>
+          </div>
+
+          <!-- Complexity Comparative Table (Section 13) -->
+          <div class="panel-header" style="margin-top: 1.5rem;">
+            <span class="panel-title" style="font-size: 0.9rem;">📐 Theoretical vs Measured Complexity Matrix (Section 13)</span>
+          </div>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Algorithm</th>
+                  <th>Time Complexity</th>
+                  <th>Space Complexity</th>
+                  <th>Best Project Use</th>
+                  <th>Measured Runtime</th>
+                </tr>
+              </thead>
+              <tbody id="complexityTbody"></tbody>
+            </table>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ========================================
+           TAB 7: DAA SYLLABUS & VIVA MASTER
+           ======================================== -->
+      <section id="tab-viva" class="tab-view">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <span class="panel-title">🎓 DAA Syllabus Mapping & Viva Questions</span>
+              <p style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                Complete alignment with academic DAA syllabus (Unit 1, 2, 3) and official examination questions from Section 20.
+              </p>
+            </div>
+            <button id="btnPrintReport" class="btn btn-secondary">🖨️ Export / Print Mission Report</button>
+          </div>
+
+          <div class="viva-list" id="vivaContainer"></div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Core Scripts -->
+  <script src="js/graph.js"></script>
+  <script src="js/database.js"></script>
+  <script src="js/algorithms.js"></script>
+  <script src="js/ai_engine.js"></script>
+  <script src="js/presets.js"></script>
+  <script src="js/algorithm_lab.js"></script>
+  <script src="js/canvas_renderer.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
